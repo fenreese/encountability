@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS group_requests (
 );
 
 CREATE TABLE IF NOT EXISTS group_requests_list (
-    id VARCHAR PRIMARY KEY,
+    id VARCHAR PRIMARY KEY REFERENCES money_requests (id),
     group_request_id VARCHAR REFERENCES group_requests (id),
     requester_id VARCHAR REFERENCES clients (id),
     amount INT NOT NULL,

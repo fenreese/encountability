@@ -23,3 +23,15 @@ def query_profiles(conn, id: list):
     query_res = cur.fetchall()
 
     return query_res
+
+def insert_request(conn, info: dict):
+    cur = conn.cursor()
+
+    cur.execute("""
+                INSERT INTO money_requests (id, requester_id, requestee_id, amount, message, status)
+                VALUES (%s, %s, %s, %s, %s, %s);
+                """, 
+                (info["id"], info["requesterId"], info["requesteeId"], info["amount"], info["message"], info["requestStatus"].lower()))
+    
+    return "something happened i think" 
+

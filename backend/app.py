@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from flask import Flask, request
 import os
 import psycopg2
+import rbcapi_handler as rbc
 
 load_dotenv()
 
@@ -71,8 +72,29 @@ def get_group_request():
 @app.route("/requestclient", methods=["POST"])
 def create_request():
     # add to rbc thing
+    # i don't wanna do any error checking this is a hackathon
+    data = {
+    "amount": "5000000",
+    "expirationDate": "2023-10-01 21:12:25.642703489 +0000 UTC m=+1387723.671519434",
+    "id": "dabc360e-5685-4c1a-98a5-e0a9bcae88fc",
+    "invoiceNumber": "",
+    "message": "for pizza",
+    "requestStatus": "PENDING",
+    "requestedDate": "2023-09-16 21:12:25.642697489 +0000 UTC m=+91723.671513434",
+    "requesteeId": "57124ec0-eaa9-4b11-b85a-739d1c5bff5d",
+    "requesteeName": "Psyduck",
+    "requesterId": "5a6c6169-5ebd-41d5-ac4e-d257dde56017",
+    "requesterName": "Pikachu"
+}
+
+    # request = rbc.create_request(
+    #     sample["id"], 
+    #     "57124ec0-eaa9-4b11-b85a-739d1c5bff5d",
+    #     5000000,
+    #     "for pizza"
+    # )
     # add to cached database
-    pass
+    return db.insert_request(conn, data)
 
 @app.route("/requestgroup", methods=["POST"])
 def create_group_request():
