@@ -96,10 +96,10 @@ def get_request():
     req_json = request.get_json()
     id = req_json["id"]
     
-    # return rbc.get_request_by_id(id)
-    res = db.query_request(conn, id)
+    return rbc.get_request_by_id(id)
+    # res = db.query_request(conn, id)
 
-    return res[0]
+    # return res[0]
 
 @app.route("/createdgrouprequests", methods=["GET"])
 def get_group_requests():
