@@ -56,7 +56,7 @@ def query_requestee_reqs(conn, id: str):
                 SELECT mr.id, mr.requester_id, mr.amount, mr.message, mr.paid_amount, c.name, c.email_address 
                 FROM money_requests mr LEFT OUTER JOIN clients c
                 ON mr.requester_id = c.id
-                WHERE requestee_id = %s
+                WHERE mr.requestee_id = %s
                 AND mr.status NOT IN ('accepted', 'declined');
                 """, (id,))
     
