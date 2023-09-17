@@ -96,7 +96,10 @@ def get_request():
     req_json = request.get_json()
     id = req_json["id"]
     
-    return rbc.get_request_by_id(id)
+    # return rbc.get_request_by_id(id)
+    res = db.query_request(conn, id)
+
+    return res[0]
 
 @app.route("/createdgrouprequests", methods=["GET"])
 def get_group_requests():
@@ -135,6 +138,7 @@ def create_group_request():
     count = 0
 
     # TODO: create ids for group purchases
+    # NOTE: i'm too lazy to fully implement this
 
     split_amount = total_cost / len(people)
     # make request for each person in the group
@@ -163,5 +167,6 @@ def update_client_request():
     rbc.update_request(transfer_request_id, status)
     
     # change state on cache
-    db.update_request(conn, transfer_request_id, status)
+    return db.update_request(conn, transfer_request_id, status)
+
     

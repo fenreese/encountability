@@ -24,6 +24,19 @@ def query_client(conn, id:str) -> tuple:
 
     return query_res
 
+def query_request(conn, id: str):
+    cur = conn.cursor()
+
+    cur.execute("""
+                SELECT status FROM money_requests 
+                WHERE id=%s;
+                """, (id,))
+    
+    query_res = cur.fetchone()
+
+    return query_res
+
+
 def query_profiles(conn, id: list):
     cur = conn.cursor()
 
@@ -80,7 +93,7 @@ def update_request(conn, id: str, status: str):
     cur.execute("""
                 UPDATE money_requests
                 SET status = %s
-                WHERE id = %s
+                WHERE id = %s;
                 """, (status, id))
     
     return "success" if cur.rowcount != -1 else "failure"
