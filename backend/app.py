@@ -41,33 +41,72 @@ def get_friends():
 
 @app.route("/profile", methods=["GET"])
 def get_profile():
-    # get your own profile info
-    return sample
+    # get your own profile info if you don't provide one
+    id = request.args.get("id", default=sample["id"], type=str)
+    client = db.query_client(conn, id)
+    return {
+        "email_address": client[0],
+        "id": client[1],
+        "name": client[2]
+    }
 
 @app.route("/createdrequests", methods=["GET"])
 def get_created_requests():
     # get all requests in which you're requester
-    pass
+    # "These people owe you..."
+    query_res = db.query_created_reqs(conn, sample["id"])
+    broke_people = []
+
+    for entry in query_res:
+        broke_people.append({
+            "request_id": entry[0],
+            "requestee_id": entry[1],
+            "amount": entry[2],
+            "message": entry[3],
+            "paid_amount": entry[4],
+            "requestee_name": entry[5],
+            "requestee_email": entry[6]
+            })
+
+    return broke_people
 
 @app.route("/clientrequests", methods=["GET"])
 def get_requests():
     # get all single requests involving you as requestee
-    pass
+    # "You owe these people..."
+    query_res = db.query_requestee_reqs(conn, sample["id"])
+    mean_people = []
+
+    for entry in query_res:
+        mean_people.append({
+            "request_id": entry[0],
+            "requester_id": entry[1],
+            "amount": entry[2],
+            "message": entry[3],
+            "paid_amount": entry[4],
+            "requester_name": entry[5],
+            "requester_email": entry[6]
+            })
+
+    return mean_people 
 
 @app.route("/clientrequest", methods=["GET"])
 def get_request():
-    # get request by id 
-    pass
+    # expects id
+    req_json = request.get_json()
+    id = req_json["id"]
+    
+    return rbc.get_request_by_id(id)
 
-@app.route("/grouprequests", methods=["GET"])
+@app.route("/createdgrouprequests", methods=["GET"])
 def get_group_requests():
     # get all group requests involving you as requester
-    pass
+    return "not implemented yet"
 
 @app.route("/grouprequest", methods=["GET"])
 def get_group_request():
     # get group request by id
-    pass
+    return "not implemented yet"
 
 @app.route("/requestclient", methods=["POST"])
 def create_request():

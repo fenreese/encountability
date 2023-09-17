@@ -12,6 +12,18 @@ def query_friends_list(conn, id: str):
 
     return query_res
 
+def query_client(conn, id:str) -> tuple:
+    cur = conn.cursor()
+
+    cur.execute("""
+                SELECT email_address, id, name FROM clients
+                WHERE id=%s;
+                """, (id,))
+    
+    query_res = cur.fetchone()
+
+    return query_res
+
 def query_profiles(conn, id: list):
     cur = conn.cursor()
 
@@ -28,8 +40,11 @@ def query_created_reqs(conn, id: str):
     cur = conn.cursor()
 
     cur.execute("""
-                SELECT id FROM money_requests
-                WHERE requester_id = %s;
+                SELECT mr.id, mr.requestee_id, mr.amount, mr.message, mr.paid_amount, c.name, c.email_address 
+                FROM money_requests mr LEFT OUTER JOIN clients c 
+                ON mr.requestee_id = c.id
+                WHERE mr.requester_id = %s
+                AND mr.status NOT IN ('accepted', 'declined');
                 """, (id,))
     
     return cur.fetchall()
@@ -38,8 +53,11 @@ def query_requestee_reqs(conn, id: str):
     cur = conn.cursor()
 
     cur.execute("""
-                SELECT id FROM money_requests
-                WHERE requestee_id = %s;
+                SELECT mr.id, mr.requester_id, mr.amount, mr.message, mr.paid_amount, c.name, c.email_address 
+                FROM money_requests mr LEFT OUTER JOIN clients c
+                ON mr.requester_id = c.id
+                WHERE requestee_id = %s
+                AND mr.status NOT IN ('accepted', 'declined');
                 """, (id,))
     
     return cur.fetchall()

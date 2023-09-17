@@ -15,6 +15,11 @@ def create_request(requestor: str, requestee: str, amount: int, message: str):
     return res.json()
 
 def update_request(request_id: str, status: str):
-    res = requests.put(url, data={"action": status.upper()}, params={"id": request_id})
+    res = requests.put(url+"/money-request", data={"action": status.upper()}, params={"id": request_id})
+
+    return res.json()
+
+def get_request_by_id(request_id: str):
+    res = requests.get(url+"/money-request", params={"id": request_id})
 
     return res.json()
