@@ -13,3 +13,8 @@ def create_request(requestor: str, requestee: str, amount: int, message: str):
                         headers={"x-signed-on-client": requestor})
     
     return res.json()
+
+def update_request(request_id: str, status: str):
+    res = requests.put(url, data={"action": status.upper()}, params={"id": request_id})
+
+    return res.json()

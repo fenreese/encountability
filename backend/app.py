@@ -61,7 +61,7 @@ def get_request():
 
 @app.route("/grouprequests", methods=["GET"])
 def get_group_requests():
-    # get all group requests involving you as requestee
+    # get all group requests involving you as requester
     pass
 
 @app.route("/grouprequest", methods=["GET"])
@@ -71,41 +71,58 @@ def get_group_request():
 
 @app.route("/requestclient", methods=["POST"])
 def create_request():
+    # json assumes requestee_id, amount, and message
+    req_data = request.get_json(force=True)
+
     # add to rbc thing
     # i don't wanna do any error checking this is a hackathon
-    data = {
-    "amount": "5000000",
-    "expirationDate": "2023-10-01 21:12:25.642703489 +0000 UTC m=+1387723.671519434",
-    "id": "dabc360e-5685-4c1a-98a5-e0a9bcae88fc",
-    "invoiceNumber": "",
-    "message": "for pizza",
-    "requestStatus": "PENDING",
-    "requestedDate": "2023-09-16 21:12:25.642697489 +0000 UTC m=+91723.671513434",
-    "requesteeId": "57124ec0-eaa9-4b11-b85a-739d1c5bff5d",
-    "requesteeName": "Psyduck",
-    "requesterId": "5a6c6169-5ebd-41d5-ac4e-d257dde56017",
-    "requesterName": "Pikachu"
-}
+    data = rbc.create_request(
+        sample["id"], 
+        req_data["requestee_id"],
+        req_data["amount"],
+        req_data["message"]
+    )
 
-    # request = rbc.create_request(
-    #     sample["id"], 
-    #     "57124ec0-eaa9-4b11-b85a-739d1c5bff5d",
-    #     5000000,
-    #     "for pizza"
-    # )
     # add to cached database
     return db.insert_request(conn, data)
 
 @app.route("/requestgroup", methods=["POST"])
 def create_group_request():
+    # expects total amount, list of people's ids, and message
+    req_data = request.get_json(force=True)
+    total_cost = req_data["amount"]
+    people = req_data["friends"]
+    message = req_data["message"]
+    count = 0
+
+    # TODO: create ids for group purchases
+
+    split_amount = total_cost / len(people)
     # make request for each person in the group
-    # add to rbc
-    # add to cached database
-    pass
+    for person in people:
+        # add to rbc
+        data = rbc.create_request(
+            sample["id"],
+            person,
+            split_amount,
+            message
+        )
+        # add to cached database
+        count += 1 if db.insert_request(conn, data) == "success" else 0
+
+    return "success" if count == people else "failure"
 
 @app.route("/updateclientrequest", methods=["PUT"])
 def update_client_request():
+    req_json = request.get_json()
+
     # get id of request
-    # change to accepted on rbc
-    # change to paid as full on site
-    pass
+    transfer_request_id = req_json["id"]
+    status = req_json["status"]
+    
+    # change state on rbc
+    rbc.update_request(transfer_request_id, status)
+    
+    # change state on cache
+    db.update_request(conn, transfer_request_id, status)
+    
