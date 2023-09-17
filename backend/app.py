@@ -101,16 +101,6 @@ def get_request():
 
     # return res[0]
 
-@app.route("/createdgrouprequests", methods=["GET"])
-def get_group_requests():
-    # get all group requests involving you as requester
-    return "not implemented yet"
-
-@app.route("/grouprequest", methods=["GET"])
-def get_group_request():
-    # get group request by id
-    return "not implemented yet"
-
 @app.route("/requestclient", methods=["POST"])
 def create_request():
     # json assumes requestee_id, amount, and message
@@ -127,6 +117,32 @@ def create_request():
 
     # add to cached database
     return db.insert_request(conn, data)
+
+@app.route("/updateclientrequest", methods=["PUT"])
+def update_client_request():
+    req_json = request.get_json()
+
+    # get id of request
+    transfer_request_id = req_json["id"]
+    status = req_json["status"]
+    
+    # change state on rbc
+    rbc.update_request(transfer_request_id, status)
+    
+    # change state on cache
+    return db.update_request(conn, transfer_request_id, status)
+
+# EVERYTHING BELOW HERE IS A WIP
+
+@app.route("/createdgrouprequests", methods=["GET"])
+def get_group_requests():
+    # get all group requests involving you as requester
+    return "not implemented yet"
+
+@app.route("/grouprequest", methods=["GET"])
+def get_group_request():
+    # get group request by id
+    return "not implemented yet"
 
 @app.route("/requestgroup", methods=["POST"])
 def create_group_request():
@@ -154,19 +170,4 @@ def create_group_request():
         count += 1 if db.insert_request(conn, data) == "success" else 0
 
     return "success" if count == people else "failure"
-
-@app.route("/updateclientrequest", methods=["PUT"])
-def update_client_request():
-    req_json = request.get_json()
-
-    # get id of request
-    transfer_request_id = req_json["id"]
-    status = req_json["status"]
-    
-    # change state on rbc
-    rbc.update_request(transfer_request_id, status)
-    
-    # change state on cache
-    return db.update_request(conn, transfer_request_id, status)
-
-    
+   
